@@ -5,26 +5,43 @@ import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
+
 load_dotenv()
-
-df = pd.read_csv("data/finance_kpi.csv")
-
-df["variance"] = df["actual"] - df["budget"]
-df["variance_pct"] = df["variance"] / df["budget"]
 
 server = os.getenv("SQL_SERVER")
 database = os.getenv("SQL_DATABASE")
 username = os.getenv("SQL_USERNAME")
-password = quote_plus(os.getenv("SQL_PASSWORD"))
+password_raw = os.getenv("SQL_PASSWORD")
 
-conn = (
+missing = [
+    name for name, value in {
+        "SQL_SERVER": server,
+        "SQL_DATABASE": database,
+        "SQL_USERNAME": username,
+        "SQL_PASSWORD": password_raw,
+    }.items()
+    if not value
+]
+
+if missing:
+    raise ValueError(f"Missing environment variables: {', '.join(missing)}")
+
+password = quote_plus(password_raw)
+
+connection_string = (
     f"mssql+pyodbc://{username}:{password}@{server}:1433/{database}"
-    "?driver=ODBC+Driver+18+for+SQL+Server"
+    "?driver=ODBC+Driver+17+for+SQL+Server"
     "&Encrypt=yes"
     "&TrustServerCertificate=no"
+    "&Connection+Timeout=30"
 )
 
-engine = create_engine(conn)
+engine = create_engine(connection_string)
+
+df = pd.read_csv("data/finance_kpi.csv")
+
+df["variance"] = df["actual"] - df["budget"]
+df["variance_pct"] = ((df["actual"] - df["budget"]) / df["budget"] * 100).round(2)
 
 df.to_sql("finance_kpi", engine, if_exists="replace", index=False)
 

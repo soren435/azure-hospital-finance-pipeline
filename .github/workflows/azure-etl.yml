@@ -21,7 +21,8 @@ jobs:
       - name: Install ODBC Driver
         run: |
           sudo apt-get update
-          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
+          odbcinst -q -d
 
       - name: Setup Python
         uses: actions/setup-python@v5

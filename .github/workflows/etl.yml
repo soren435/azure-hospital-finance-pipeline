@@ -34,9 +34,9 @@ jobs:
 
       - name: Run ETL
         env:
-          SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
-          SQL_DATABASE: ${{ secrets.AZURE_SQL_DATABASE }}
-          SQL_USERNAME: ${{ secrets.AZURE_SQL_USERNAME }}
-          SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+          SQL_SERVER: ${{ secrets.SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
+          SQL_USERNAME: ${{ secrets.SQL_USERNAME }}
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
           python src/etl.py

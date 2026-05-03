@@ -1,36 +1,32 @@
-name: Azure ETL Pipeline
+name: Run Azure ETL
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
 
 jobs:
   run-etl:
     runs-on: ubuntu-latest
 
-    env:
-      SQL_SERVER: ${{ secrets.SQL_SERVER }}
-      SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
-      SQL_USERNAME: ${{ secrets.SQL_USERNAME }}
-      SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Install ODBC Driver
-        run: |
-          sudo apt-get update
-          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
-          odbcinst -q -d
-
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Install packages
-        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
       - name: Run ETL
-        run: python src/etl.py
+        env:
+          SQL_SERVER: ${{ secrets.SQL_SERVER }}
+          SQL_DATABASE: ${{ secrets.SQL_DATABASE }}
+          SQL_USERNAME: ${{ secrets.SQL_USERNAME }}
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+        run: |
+          python src/etl.py

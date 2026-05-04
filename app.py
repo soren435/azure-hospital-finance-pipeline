@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import streamlit as st
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
+
+load_dotenv()
 
 st.set_page_config(page_title="Finance KPI Dashboard", layout="wide")
 
